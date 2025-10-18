@@ -1,0 +1,10 @@
+collections:
+  - name: ansible.netcommon
+  - name: community.network
+  - name: cisco.ios
+  - name: cisco.nxos
+  - name: juniper.device
+  - name: fortinet.fortios
+  - name: paloaltonetworks.panos
+  - name: arubanetworks.aoscx
+  - name: f5networks.f5_modules

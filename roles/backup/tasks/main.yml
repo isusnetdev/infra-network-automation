@@ -1,0 +1,19 @@
+- name: Collect config via Napalm when available
+  napalm_get:
+    dev_os: "{{ ansible_network_os | default('') }}"
+    filter: config
+  register: napalm_cfg
+  failed_when: false
+
+- name: Ensure backup directory exists (delegate to controller)
+  delegate_to: localhost
+  file:
+    path: "/opt/network-backups/{{ inventory_hostname }}"
+    state: directory
+    mode: '0750'
+
+- name: Write running config to file (controller)
+  delegate_to: localhost
+  copy:
+    dest: "/opt/network-backups/{{ inventory_hostname }}/running.cfg"
+    content: "{{ (napalm_cfg['config'] if napalm_cfg is defined else 'no-config') | to_nice_yaml }}"

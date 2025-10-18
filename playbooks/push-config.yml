@@ -1,0 +1,25 @@
+- name: Push configuration changes (multi-vendor)
+  hosts: target_group
+  gather_facts: no
+  vars:
+    dry_run: "{{ lookup('env','DRY_RUN') | default('false') }}"
+  tasks:
+    - name: Render platform specific template (example)
+      template:
+        src: templates/{{ ansible_network_os | default('generic') }}.j2
+        dest: /tmp/{{ inventory_hostname }}_cfg
+      when: lookup('file', 'templates/' ~ (ansible_network_os | default('generic')) ~ '.j2', errors='ignore') is defined
+
+    - name: Push via vendor collection where available (FortiGate example)
+      fortinet.fortios.fortios_firewall_policy:
+        host: "{{ ansible_host }}"
+        username: "{{ vault_fortigate_user | default('admin') }}"
+        password: "{{ vault_fortigate_pass | default('changeme') }}"
+        vdom: "root"
+        state: present
+      when: ansible_network_os == 'fortios' and dry_run == 'false'
+
+    - name: Push via CLI fallback
+      ansible.netcommon.cli_config:
+        src: /tmp/{{ inventory_hostname }}_cfg
+      when: dry_run == 'false' and (ansible_network_os not in ['fortios','paloaltonetworks.panos','aoscx'])

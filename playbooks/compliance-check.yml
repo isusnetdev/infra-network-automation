@@ -1,0 +1,16 @@
+- name: Compliance checks across inventory
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Collect running config via napalm where supported
+      napalm_get:
+        dev_os: "{{ ansible_network_os | default('') }}"
+        filter: config
+      register: cfg
+      failed_when: false
+
+    - name: Save sample config to tmp for inspection
+      copy:
+        dest: /tmp/{{ inventory_hostname }}_running.cfg
+        content: "{{ cfg['config'] if cfg is defined else 'no-config' }}"
+      when: cfg is defined

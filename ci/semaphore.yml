@@ -1,0 +1,32 @@
+version: 'v1'
+name: Network Automation CI
+agents:
+  - name: default
+    hosts: ['runners.example.local']
+
+blocks:
+  - name: Lint
+    tasks:
+      - name: Install deps
+        command: pip install ansible-lint yamllint
+      - name: Run ansible-lint
+        command: ansible-lint -v playbooks/
+
+  - name: Tests
+    tasks:
+      - name: Run molecule tests
+        command: molecule test
+
+  - name: Dry Run (lab)
+    tasks:
+      - name: Run playbook with check mode
+        command: ansible-playbook -i inventories/lab playbooks/push-config.yml --check
+
+  - name: Approval Gate
+    type: approval
+    approvers: ['network-admin']
+
+  - name: Deploy to Production
+    tasks:
+      - name: Apply Playbook
+        command: ansible-playbook -i inventories/production playbooks/push-config.yml

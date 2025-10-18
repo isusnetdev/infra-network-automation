@@ -1,0 +1,1 @@
+Role: backup - collects config and stores in controller path. In production use Oxidized for continuous backups.

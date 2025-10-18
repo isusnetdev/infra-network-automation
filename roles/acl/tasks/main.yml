@@ -1,0 +1,24 @@
+- name: Render ACL for Cisco IOS
+  template:
+    src: acl/templates/ios.j2
+    dest: /tmp/{{ inventory_hostname }}_acl.cfg
+  when: ansible_network_os in ['ios','nxos']
+
+- name: Apply ACL via IOS CLI
+  ansible.netcommon.cli_config:
+    src: /tmp/{{ inventory_hostname }}_acl.cfg
+  when: ansible_network_os in ['ios','nxos']
+
+- name: Apply ACL to FortiGate via API
+  fortinet.fortios.fortios_firewall_policy:
+    host: "{{ ansible_host }}"
+    username: "{{ vault_fortigate_user | default('admin') }}"
+    password: "{{ vault_fortigate_pass | default('changeme') }}"
+    vdom: "root"
+    state: present
+  when: ansible_network_os == 'fortios'
+
+- name: Apply ACL to AOS-CX via collection
+  arubanetworks.aoscx.aoscx_config:
+    config: "{{ lookup('file', 'roles/acl/templates/aoscx.cfg') }}"
+  when: ansible_network_os is search('aoscx')

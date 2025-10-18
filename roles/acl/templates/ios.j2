@@ -1,0 +1,5 @@
+! ACL generated from Ansible - example
+ip access-list extended NET-ACL
+{% for rule in acl_rules %}
+ permit {{ rule.proto }} {{ rule.src }} {{ rule.dst }} eq {{ rule.port }}
+{% endfor %}

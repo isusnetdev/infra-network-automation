@@ -1,0 +1,17 @@
+---
+username: admin
+password: secret
+model: ios
+interval: 3600
+use_syslog: false
+log: /root/.config/oxidized/log
+output:
+  git:
+    user: Oxidized
+    email: oxidized@example.com
+    repo: "/root/.config/oxidized/git"
+source:
+  default: csv
+csv:
+  file: '/root/.config/oxidized/router.db'
+rest: 0.0.0.0:8888

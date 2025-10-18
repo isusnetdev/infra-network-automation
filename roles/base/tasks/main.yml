@@ -1,0 +1,10 @@
+- name: Configure NTP (platform agnostic via templates)
+  template:
+    src: ../../templates/ntp/{{ ansible_network_os | default('generic') }}.j2
+    dest: /tmp/{{ inventory_hostname }}_ntp.cfg
+  when: true
+
+- name: Push NTP config (fallback CLI)
+  ansible.netcommon.cli_config:
+    src: /tmp/{{ inventory_hostname }}_ntp.cfg
+  when: ansible_network_os not in ['fortios','paloaltonetworks.panos']

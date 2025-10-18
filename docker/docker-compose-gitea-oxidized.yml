@@ -1,0 +1,17 @@
+version: '3'
+services:
+  gitea:
+    image: gitea/gitea:latest
+    ports:
+      - "3000:3000"
+      - "222:22"
+    volumes:
+      - ./gitea:/data
+
+  oxidized:
+    image: ytti/oxidized:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./oxidized/config:/root/.config/oxidized
+      - ./oxidized/git:/root/.config/oxidized/git

@@ -11,7 +11,7 @@ FEATURE_BRANCH="feature/multi-vendor-skeleton"
 PR_TITLE="Adiciona esqueleto multi-vendor"
 PR_BODY="Estrutura inicial para automação multi-vendor com Ansible e Semaphore."
 GIT_USER_NAME="isusnetdev"                   # altere para seu nome
-GIT_USER_EMAIL="isusnetdev@gmail.com.com"    # altere para seu email
+GIT_USER_EMAIL="isusnetdev@gmail.com"    # altere para seu email
 
 # =======================
 # Inicialização do repositório
@@ -35,6 +35,19 @@ fi
 # =======================
 git config user.name "$GIT_USER_NAME"
 git config user.email "$GIT_USER_EMAIL"
+
+# =======================
+# Garantir que a branch production exista
+# =======================
+git fetch origin || true
+
+if git show-ref --verify --quiet "refs/remotes/origin/$BASE_BRANCH"; then
+    echo "✅ Branch $BASE_BRANCH já existe no remoto"
+else
+    echo "📌 Branch $BASE_BRANCH não encontrada, criando..."
+    git checkout -b "$BASE_BRANCH"
+    git push -u origin "$BASE_BRANCH"
+fi
 
 # =======================
 # Criar branch de feature
@@ -63,7 +76,7 @@ git commit -m "$PR_TITLE" || echo "⚠️ Nenhuma mudança para commitar"
 git push -u origin "$FEATURE_BRANCH"
 
 # =======================
-# Criar Pull Request sem abrir browser
+# Criar Pull Request sem abrir navegador
 # =======================
 gh pr create --base "$BASE_BRANCH" --head "$FEATURE_BRANCH" \
     --title "$PR_TITLE" --body "$PR_BODY" --fill
